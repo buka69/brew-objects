@@ -1,4 +1,5 @@
 import './globals.css';
+import './controls.css';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 export const metadata:Metadata={title:'BREW / OBJECTS — Specialty Coffee Tools',description:'Pre-launch European specialty coffee equipment store for home brewers and cafés.',robots:{index:false,follow:false}};
