@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {galleryFor} from '../../../lib/gallery40';
+import {catalog40} from '../../../lib/catalog40';
 
 export const runtime='nodejs';
 export const revalidate=86400;
@@ -40,16 +41,17 @@ function pickImage(html:string,base:URL){
 }
 
 export async function GET(req:NextRequest){
- const id=req.nextUrl.searchParams.get('id')||'';
+ const explicitId=req.nextUrl.searchParams.get('id')||'';
+ const raw=req.nextUrl.searchParams.get('url')||'';
+ const mappedId=explicitId||catalog40.find(p=>p.source===raw)?.id||'';
  const variant=Math.max(0,Math.min(3,Number(req.nextUrl.searchParams.get('variant')||0)||0));
- const gallery=id?galleryFor(id):undefined;
+ const gallery=mappedId?galleryFor(mappedId):undefined;
  if(gallery){
   try{return await fetchImage(gallery[variant])}
   catch{return new NextResponse(null,{status:404,headers:{'cache-control':'no-store'}})}
  }
 
- // Legacy URL mode kept for old links/components; the current storefront uses pinned id galleries above.
- const raw=req.nextUrl.searchParams.get('url');
+ // Legacy URL mode for anything outside the 40 pinned products.
  if(!raw)return new NextResponse('missing id/url',{status:400});
  let u:URL;try{u=new URL(raw)}catch{return new NextResponse('bad url',{status:400})}
  if(!['http:','https:'].includes(u.protocol)||!allowed.includes(u.hostname))return new NextResponse('host not allowed',{status:403});
