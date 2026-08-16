@@ -22,7 +22,13 @@ const decodeHtml=(s:string)=>s.replace(/&amp;/g,'&').replace(/&#x2F;/g,'/').repl
 function imageKey(url:string){
  try{
   const u=new URL(url);
-  return `${u.host}${u.pathname.replace(/-(?:small|medium|large|home|cart)_default(?=\.)/i,'')}`.toLowerCase();
+  const parts=u.pathname.split('/');
+  const file=(parts.pop()||'')
+   .replace(/-(?:small|medium|large|home|cart)_default(?=\.)/i,'')
+   .replace(/(?:_|-)(?:\d{2,4}x\d{0,4}|\d{2,4}x)(?=\.)/i,'')
+   .replace(/@\d+x(?=\.)/i,'')
+   .toLowerCase();
+  return file||u.pathname.toLowerCase();
  }catch{return url.split('?')[0].toLowerCase()}
 }
 
@@ -49,6 +55,12 @@ function collectImages(html:string,base:URL){
  for(const m of html.matchAll(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["']/gi))add(m[1]);
  for(const block of html.matchAll(/"image"\s*:\s*\[([^\]]+)\]/gi))for(const m of block[1].matchAll(/"([^"]+)"/g))add(m[1]);
  for(const m of html.matchAll(/"image"\s*:\s*"([^"]+)"/gi))add(m[1]);
+
+ // Gallery links often point to the full-size image while the nested img is only a thumb.
+ for(const tag of html.matchAll(/<a\b[^>]*>/gi)){
+  const t=tag[0];
+  for(const m of t.matchAll(/(?:href|data-image|data-zoom-image)=["']([^"']+\.(?:jpg|jpeg|png|webp)(?:\?[^"']*)?)["']/gi))add(m[1]);
+ }
 
  // Gallery/thumb image tags. srcset can expose alternate gallery files even when src repeats.
  for(const tag of html.matchAll(/<img\b[^>]*>/gi)){
@@ -84,7 +96,10 @@ export async function GET(req:NextRequest){
   const r=await fetch(u.toString(),{headers:{'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/128 Safari/537.36','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8','accept-language':'en-US,en;q=0.9'},redirect:'follow',next:{revalidate:86400}});
   if(r.ok){
    const ct=(r.headers.get('content-type')||'').toLowerCase();
-   if(ct.startsWith('image/'))return new NextResponse(await r.arrayBuffer(),{headers:{'content-type':ct,'cache-control':'public, max-age=86400, s-maxage=604800'}});
+   if(ct.startsWith('image/')){
+    if(variant>0)return new NextResponse(null,{status:404,headers:{'cache-control':'no-store'}});
+    return new NextResponse(await r.arrayBuffer(),{headers:{'content-type':ct,'cache-control':'public, max-age=86400, s-maxage=604800'}});
+   }
    candidates=collectImages(await r.text(),u);
   }
 
@@ -100,10 +115,12 @@ export async function GET(req:NextRequest){
   }
 
   if(fixed&&!candidates.some(x=>imageKey(x)===imageKey(fixed[1])))candidates.unshift(fixed[1]);
-  const chosen=candidates[variant]||candidates[0];
+  const chosen=candidates[variant];
   if(chosen)return await fetchImage(chosen,u.origin+'/');
+  if(variant>0)return new NextResponse(null,{status:404,headers:{'cache-control':'no-store'}});
   throw new Error('image not found');
  }catch{
+  if(variant>0)return new NextResponse(null,{status:404,headers:{'cache-control':'no-store'}});
   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><rect width="100%" height="100%" fill="#f1ede5"/><text x="50%" y="49%" text-anchor="middle" font-family="Arial" font-size="30" fill="#777">Photo unavailable</text><text x="50%" y="55%" text-anchor="middle" font-family="Arial" font-size="18" fill="#999">BREW / OBJECTS</text></svg>';
   return new NextResponse(svg,{status:200,headers:{'content-type':'image/svg+xml','cache-control':'no-store'}});
  }
