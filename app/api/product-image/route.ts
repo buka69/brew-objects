@@ -19,21 +19,46 @@ const overrides:[RegExp,string][]=[
 
 const decodeHtml=(s:string)=>s.replace(/&amp;/g,'&').replace(/&#x2F;/g,'/').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\\u002F/g,'/');
 
-function pickImage(html:string,base:URL){
- const patterns=[
-  /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i,
-  /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["']/i,
-  /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']/i,
-  /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["']/i,
-  /"image"\s*:\s*"([^"]+)"/i,
-  /"image"\s*:\s*\[\s*"([^"]+)"/i,
-  /<img[^>]+(?:data-src|src)=["']([^"']+)["'][^>]*(?:product|main|featured)/i,
-  /<img[^>]+(?:data-src|src)=["']([^"']+\.(?:jpg|jpeg|png|webp)(?:\?[^"']*)?)["']/i,
-  /https?:\/\/[^"'\\s>]+-large_default\/[^"'\\s>]+\.(?:jpg|jpeg|png|webp)/i,
-  /https?:\/\/[^"'\\s>]+\/cdn\/shop\/(?:products|files)\/[^"'\\s>]+\.(?:jpg|jpeg|png|webp)[^"'\\s>]*/i
- ];
- for(const p of patterns){const m=html.match(p);if(m){try{return new URL(decodeHtml(m[1]||m[0]),base).toString()}catch{}}}
- return '';
+function imageKey(url:string){
+ try{
+  const u=new URL(url);
+  return `${u.host}${u.pathname.replace(/-(?:small|medium|large|home|cart)_default(?=\.)/i,'')}`.toLowerCase();
+ }catch{return url.split('?')[0].toLowerCase()}
+}
+
+function collectImages(html:string,base:URL){
+ const out:string[]=[];
+ const seen=new Set<string>();
+ const add=(raw:string)=>{
+  if(!raw)return;
+  try{
+   const url=new URL(decodeHtml(raw),base).toString();
+   if(!/^https?:/i.test(url))return;
+   const key=imageKey(url);
+   if(seen.has(key))return;
+   seen.add(key);out.push(url);
+  }catch{}
+ };
+
+ // Product-gallery images first (common on PrestaShop / Shopify product pages).
+ for(const m of html.matchAll(/https?:\/\/[^"'\\s>]+-large_default\/[^"'\\s>]+\.(?:jpg|jpeg|png|webp)(?:\?[^"'\\s>]*)?/gi))add(m[0]);
+ for(const m of html.matchAll(/https?:\/\/[^"'\\s>]+\/cdn\/shop\/(?:products|files)\/[^"'\\s>]+\.(?:jpg|jpeg|png|webp)(?:\?[^"'\\s>]*)?/gi))add(m[0]);
+
+ // Structured product imagery.
+ for(const m of html.matchAll(/<meta[^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["'][^>]+content=["']([^"']+)["']/gi))add(m[1]);
+ for(const m of html.matchAll(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["']/gi))add(m[1]);
+ for(const block of html.matchAll(/"image"\s*:\s*\[([^\]]+)\]/gi))for(const m of block[1].matchAll(/"([^"]+)"/g))add(m[1]);
+ for(const m of html.matchAll(/"image"\s*:\s*"([^"]+)"/gi))add(m[1]);
+
+ // Gallery/thumb image tags. srcset can expose alternate gallery files even when src repeats.
+ for(const tag of html.matchAll(/<img\b[^>]*>/gi)){
+  const t=tag[0];
+  for(const m of t.matchAll(/(?:data-zoom-image|data-image-large-src|data-src|src)=["']([^"']+)["']/gi))add(m[1]);
+  for(const m of t.matchAll(/srcset=["']([^"']+)["']/gi)){
+   for(const part of m[1].split(','))add(part.trim().split(/\s+/)[0]);
+  }
+ }
+ return out;
 }
 
 async function fetchImage(url:string,referer:string){
@@ -46,29 +71,37 @@ async function fetchImage(url:string,referer:string){
 
 export async function GET(req:NextRequest){
  const raw=req.nextUrl.searchParams.get('url');
+ const variant=Math.max(0,Math.min(7,Number(req.nextUrl.searchParams.get('variant')||0)||0));
  if(!raw)return new NextResponse('missing url',{status:400});
  let u:URL;
  try{u=new URL(raw)}catch{return new NextResponse('bad url',{status:400})}
  if(!['http:','https:'].includes(u.protocol)||!allowed.includes(u.hostname))return new NextResponse('host not allowed',{status:403});
  try{
   const fixed=overrides.find(([pattern])=>pattern.test(u.pathname));
-  if(fixed)return await fetchImage(fixed[1],new URL(fixed[1]).origin+'/');
+  if(fixed&&variant===0)return await fetchImage(fixed[1],new URL(fixed[1]).origin+'/');
+
+  let candidates:string[]=[];
   const r=await fetch(u.toString(),{headers:{'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/128 Safari/537.36','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8','accept-language':'en-US,en;q=0.9'},redirect:'follow',next:{revalidate:86400}});
   if(r.ok){
    const ct=(r.headers.get('content-type')||'').toLowerCase();
    if(ct.startsWith('image/'))return new NextResponse(await r.arrayBuffer(),{headers:{'content-type':ct,'cache-control':'public, max-age=86400, s-maxage=604800'}});
-   const html=await r.text();
-   const found=pickImage(html,u);
-   if(found)return await fetchImage(found,u.origin+'/');
+   candidates=collectImages(await r.text(),u);
   }
+
   const reader=`https://r.jina.ai/http://${u.host}${u.pathname}${u.search}`;
   const rr=await fetch(reader,{headers:{'user-agent':'BREWOBJECTS/1.0'},redirect:'follow',next:{revalidate:86400}});
   if(rr.ok){
    const md=await rr.text();
-   const candidates=[...md.matchAll(/!\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/g)].map(m=>m[1]);
-   const preferred=candidates.find(x=>/product|cdn|media|image|shop|uploads/i.test(x))||candidates[0];
-   if(preferred)return await fetchImage(preferred,u.origin+'/');
+   const seen=new Set(candidates.map(imageKey));
+   for(const m of md.matchAll(/!\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/g)){
+    const url=m[1],key=imageKey(url);
+    if(!seen.has(key)){seen.add(key);candidates.push(url)}
+   }
   }
+
+  if(fixed&&!candidates.some(x=>imageKey(x)===imageKey(fixed[1])))candidates.unshift(fixed[1]);
+  const chosen=candidates[variant]||candidates[0];
+  if(chosen)return await fetchImage(chosen,u.origin+'/');
   throw new Error('image not found');
  }catch{
   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><rect width="100%" height="100%" fill="#f1ede5"/><text x="50%" y="49%" text-anchor="middle" font-family="Arial" font-size="30" fill="#777">Photo unavailable</text><text x="50%" y="55%" text-anchor="middle" font-family="Arial" font-size="18" fill="#999">BREW / OBJECTS</text></svg>';
