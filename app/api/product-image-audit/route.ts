@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from 'next/server';
 import sharp from 'sharp';
 import {gallery40} from '../../../lib/gallery40';
+import {galleryFixFor} from '../../../lib/galleryFixes';
 import {catalog40} from '../../../lib/catalog40';
 
 export const runtime='nodejs';
@@ -23,7 +24,7 @@ async function inspect(url:string){
  }catch(e){return {url,error:e instanceof Error?e.message:String(e)}}
 }
 async function audit(id:string){
- const gallery=gallery40[id];
+ const gallery=galleryFixFor(id)||gallery40[id];
  if(!gallery)return {id,ok:false,error:'no pinned gallery'};
  const images=await Promise.all(gallery.map(inspect));
  const good=images.filter((x):x is {url:string;width:number;height:number;bytes:number;ahash:string}=>'ahash' in x);
