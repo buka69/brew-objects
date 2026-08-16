@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import sharp from 'sharp';
+import {catalog40} from '../../../lib/catalog40';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -46,8 +47,10 @@ async function inspect(url:string,referer:string){
 const pop=[0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4];
 function hamming(a:string,b:string){let n=0;const len=Math.min(a.length,b.length);for(let i=0;i<len;i++)n+=pop[parseInt(a[i],16)^parseInt(b[i],16)];return n+Math.abs(a.length-b.length)*4}
 export async function GET(req:NextRequest){
- const raw=req.nextUrl.searchParams.get('url');if(!raw)return NextResponse.json({error:'missing url'},{status:400});let u:URL;try{u=new URL(raw)}catch{return NextResponse.json({error:'bad url'},{status:400})}if(!allowed.includes(u.hostname))return NextResponse.json({error:'host not allowed'},{status:403});
+ const id=req.nextUrl.searchParams.get('id');
+ const raw=req.nextUrl.searchParams.get('url')||catalog40.find(p=>p.id===id)?.source;
+ if(!raw)return NextResponse.json({error:'missing product id/url'},{status:400});let u:URL;try{u=new URL(raw)}catch{return NextResponse.json({error:'bad url'},{status:400})}if(!allowed.includes(u.hostname))return NextResponse.json({error:'host not allowed'},{status:403});
  const candidates=(await getCandidates(u)).slice(0,20);const inspected=await Promise.all(candidates.map(x=>inspect(x,u.origin+'/')));const good=inspected.filter((x):x is {url:string;width:number;height:number;bytes:number;ahash:string}=>'ahash' in x);
  const selected:typeof good=[];for(const x of good){if(x.width<250||x.height<250)continue;if(selected.every(y=>hamming(x.ahash,y.ahash)>=18))selected.push(x);if(selected.length===4)break}
- return NextResponse.json({source:raw,count:candidates.length,selected,all:inspected});
+ return NextResponse.json({id,source:raw,count:candidates.length,selected,all:inspected});
 }
