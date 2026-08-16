@@ -6,6 +6,12 @@ export const galleryFixes:Record<string,ProductGallery>={
   'https://coffeestuff.co.nz/cdn/shop/files/motta-tulip-milk-frothing-jug-500ml-yellow-2.jpg?v=1779068408&width=1946',
   'https://coffeestuff.co.nz/cdn/shop/files/motta-tulip-milk-frothing-jug-500ml-yellow-3.jpg?v=1779068400&width=1946',
   'https://coffeestuff.co.nz/cdn/shop/files/motta-tulip-milk-frothing-jug-500ml-yellow-4.jpg?v=1779068425&width=1946'
+ ],
+ 'cafelat-cloths':[
+  'https://www.complementosdelcafe.com/4813-medium_default/cafelat-pack-4-panos-microfibra.jpg',
+  'https://area51coffeeroasters.com/wp-content/uploads/Gear-CafelatMicrofiberCloths_4pack-P01-1080w.png',
+  'https://area51coffeeroasters.com/wp-content/uploads/Gear-CafelatMicrofiberCloths_4pack-SL01-1080w.png',
+  'https://area51coffeeroasters.com/wp-content/uploads/Gear-CafelatMicrofiberCloths_4pack-SL02-1080w.png'
  ]
 };
 
