@@ -1,0 +1,83 @@
+export type ProductGallery=readonly [string,string,string,string];
+
+const cc=(n:number,slug:string)=>`https://www.complementosdelcafe.com/${n}-medium_default/${slug}.jpg`;
+
+export const gallery40:Record<string,ProductGallery>={
+ v60:[
+  'https://www.hario-europe.com/cdn/shop/products/VDC-02-PUH-EXweb.png?v=1683550130',
+  'https://www.espressocoffeeshop.com/3826-large_default/hario-v60-dripper-02-ceramica-viola.jpg',
+  'https://store.crooked.com/cdn/shop/products/Crookedcoffee_pettybrew_productphotography19_FINAL-327551_grande.jpg?v=1707156861',
+  'https://beanstockcoffee.com/cdn/shop/products/IMG_1343_1024x1024.jpg?v=1636912780'
+ ],
+ server:[
+  'https://www.hario-europe.com/cdn/shop/files/VFP-1000_web04.png?v=1683557313&width=5760',
+  'https://m.media-amazon.com/images/I/71XndyYqMZL._AC_SL1000_.jpg',
+  'https://hermanoscoffeeroasters.com/cdn/shop/files/hario-600ml-server-product-image.jpg?v=1714657928&width=1445',
+  'https://millennialscoffeepr.com/cdn/shop/products/IMG_5015_42f3c192-0ac3-4698-bf5f-cf31fe6ca288_1024x1024.jpg?v=1588274402'
+ ],
+ kettle:[
+  'https://fellowproducts.com/cdn/shop/files/Web_PDP_StaggEKGElectricKettle-Pro_Woodland_Walnut_1.png?v=1773351258',
+  'https://images.squarespace-cdn.com/content/v1/611593ff48e9bd20354ddfcb/1700792812072-32XFOO8N8MXALQ08KAAJ/Fellow_Stagg_EKG_05-2aa92c137b7040bebb507f3775a4d9a0.jpg?format=2500w',
+  'https://fstapdltb.filerobot.com/akeneo-belco/RessourceFamilies/equipement_media_dam_to_pim/FELLOW_STAGGEKG_BL_AMB%2B%282%29.jpg?vh=6024c0',
+  'https://www.citiesocial.com/cdn/shop/products/13_346b251c-78a2-451e-a1c1-3cfb92a4994e.jpg?v=1689904271'
+ ],
+ grinder:[
+  'https://img.kavosdraugas.lt/40823e04-2069-4760-ae3d-fc9aaa789668/1000x1000/nitro-blade-black4png.jpg',
+  'https://www.rigtigkaffe.dk/28667-thickbox_default/comandante-c40-mk4-kaffemolle-nitro-blade-black.jpg',
+  'https://cdn.shopify.com/s/files/1/0598/1202/0375/products/squareblack_2000x_9b611b88-5747-4966-9619-93909f115bbf.png?v=1654805181',
+  'https://comandantegrinder.com/cdn/shop/files/slider_02.jpg?v=1741355501&width=2134'
+ ],
+ scale:[
+  'https://eu.acaia.co/cdn/shop/files/PearlS_white_3.jpg?v=1768313576',
+  'https://eu.acaia.co/cdn/shop/files/PearlS_black_1_1500x.jpg?v=1768313576',
+  'https://eu.acaia.co/cdn/shop/products/PearlS2022_1500x1000_03.jpg?v=1739179523&width=1500',
+  'https://eu.acaia.co/cdn/shop/products/PearlS2022_1500x1000_04.jpg?v=1739179523&width=1500'
+ ],
+ pitcher:[cc(6927,'studio-barista-classic-milk-pitcher-600ml-stainless-steel'),cc(6928,'studio-barista-classic-milk-pitcher-600ml-stainless-steel'),cc(6879,'studio-barista-classic-milk-pitcher-600ml-stainless-steel'),cc(6905,'studio-barista-classic-milk-pitcher-600ml-stainless-steel')],
+ moccamaster:[
+  'https://nano-kaffee.de/cdn/shop/files/KBGSelectCopper.jpg?v=1732010415',
+  'https://www.barista.gr/images/thumbs/0298938_W-4.jpg',
+  'https://brewinggadgets.in/cdn/shop/files/MOCCAMASTER_KBG_COPPER_9.webp?v=1760536209&width=1946',
+  'https://brewinggadgets.in/cdn/shop/files/MOCCAMASTER_KBG_COPPER_8.webp?v=1760536209&width=1445'
+ ],
+ pezzetti:[
+  cc(3864,'pezzetti-moka-belleexpress-1-cup-black'),
+  'https://finesio.b-cdn.net/product-pim/1/4/3/9/143914eba92e9683d6e8d65473fdd02b57f6aad1_178632_packshot.jpg?class=public',
+  'https://finesio.b-cdn.net/product-pim/0/6/6/2/0662d76829d1f3bfd428a2bfc3bf2c956591f288_178632_narrow_arrange.jpg?class=public',
+  'https://roomplus.co.za/cdn/shop/files/pezzetti-ital-express-stove-top-coffee-maker-black-9894221_2048x.jpg?v=1758030134'
+ ],
+ 'kinto-oct':[cc(4953,'kinto-oct-brewer-4-cups-white'),cc(4951,'kinto-oct-brewer-4-cups-white'),cc(4952,'kinto-oct-brewer-4-cups-white'),'https://kinto-europe.com/cdn/shop/files/oct_21ss_003_sq-v1649771174780.jpg?v=1756721825&width=1024'],
+ suiren:[cc(5496,'hario-v60-suiren-02-black'),cc(5497,'hario-v60-suiren-02-black'),cc(5498,'hario-v60-suiren-02-black'),'https://product.hstatic.net/200000038436/product/pheu-pha-ca-phe-hario-v60-suiren-vdsu-09_04139b7fe5924b12873c73af3a007223_master.png'],
+ syphon:[cc(3224,'hario-coffee-syphon-technica-5'),cc(3222,'hario-coffee-syphon-technica-5'),cc(3221,'hario-coffee-syphon-technica-5'),cc(3223,'hario-coffee-syphon-technica-5')],
+ mizudashi:[cc(3502,'hario-mizudashi-cold-brew-coffee-pot-1000ml-brown'),cc(3505,'hario-mizudashi-cold-brew-coffee-pot-1000ml-brown'),cc(3503,'hario-mizudashi-cold-brew-coffee-pot-1000ml-brown'),cc(3504,'hario-mizudashi-cold-brew-coffee-pot-1000ml-brown')],
+ 'bialetti-black':[cc(2048,'bialetti-moka-express-6-cups-black'),cc(2046,'bialetti-moka-express-6-cups-black'),cc(2047,'bialetti-moka-express-6-cups-black'),'https://capecoffeebeans.co.za/cdn/shop/files/moka_6_cup_exclusive_black_grande.jpg?v=1776762114'],
+ 'stagg-xf':[cc(2438,'fellow-dripper-stagg-xf-set'),cc(2439,'fellow-dripper-stagg-xf-set'),cc(2437,'fellow-dripper-stagg-xf-set'),'https://fellowproducts.com/cdn/shop/files/Web_PDP_2_Stagg_XF_Pour-OverSet_HowItWorks_Desktop.jpg?v=1773326540&width=1420'],
+ 'moccamaster-mug':[cc(5331,'moccamaster-cup-one-mug-300ml'),cc(3358,'moccamaster-cup-one-mug-300ml'),cc(3359,'moccamaster-cup-one-mug-300ml'),cc(3360,'moccamaster-cup-one-mug-300ml')],
+ 'aeropress-carafe':[cc(1907,'aeropress-carafe-600ml'),cc(1904,'aeropress-carafe-600ml'),cc(1906,'aeropress-carafe-600ml'),cc(1905,'aeropress-carafe-600ml')],
+ 'moccamaster-kbgt':[cc(3309,'moccamaster-kbgt-black'),cc(3310,'moccamaster-kbgt-black'),'https://cdn11.bigcommerce.com/s-f5f38/images/stencil/1080x1080/products/2733/17628/image__22382.1759496421.png?c=2','https://us.moccamaster.com/cdn/shop/files/KBGTBlack02_MidnightEdit_1_2048x.jpg?v=1770054702'],
+ 'bialetti-induction':[cc(2089,'bialetti-moka-induction-red-6-cups'),'https://http2.mlstatic.com/D_NQ_NP_994338-MLC106609375166_022026-O.webp','https://www.yagos.it/37060-thickbox_default/Caffettiera-Bialetti-Moka-Induction-rosso.jpg','https://cdn.idealo.com/folder/Product/200760/1/200760152/s1_produktbild_max/bialetti-moka-induktion-6-tassen-rot-0006946.jpg'],
+ 'origami-tea':[cc(5573,'origami-tea-dripper-matte-beige'),cc(5574,'origami-tea-dripper-matte-beige'),'https://www.mujostore.com/cdn/shop/files/origami-dripper-S-matte-beige-7.jpg?v=1739352706','https://www.mujostore.com/cdn/shop/files/origami-wood-dripper-holder-acacia-dripper-S-matte-beige.jpg?v=1739352706&width=3840'],
+ 'aeropress-filter':[cc(1921,'aeropress-stainless-steel-reusable-filter'),cc(1924,'aeropress-stainless-steel-reusable-filter'),cc(1922,'aeropress-stainless-steel-reusable-filter'),cc(1923,'aeropress-stainless-steel-reusable-filter')],
+ 'epic-latte-red':[cc(6825,'epic-taza-y-plato-latte-180ml-rojo'),cc(6831,'epic-taza-y-plato-latte-180ml-rojo'),'https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-758815.jpg?v=1723743546&width=1080','https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-273438.jpg?v=1723743546&width=1000'],
+ 'epic-latte-blue':[cc(4642,'epic-taza-y-plato-latte-180ml-azul'),cc(6820,'epic-taza-y-plato-latte-180ml-azul'),'https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-758815.jpg?v=1723743546&width=1080','https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-273438.jpg?v=1723743546&width=1000'],
+ 'epic-latte-black':[cc(4649,'epic-taza-y-plato-latte-180ml-negro'),cc(6839,'epic-taza-y-plato-latte-180ml-negro'),'https://mkfresh.pl/hpeciai/2b85eb234c65d50b6afa70871b38f24c/pol_pl_Czarna-filizanka-do-kawy-EPIC-180-ml-11794_1.jpg','https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-273438.jpg?v=1723743546&width=1000'],
+ 'epic-latte-grey':[cc(4648,'epic-taza-y-plato-latte-180ml-gris'),cc(6854,'epic-taza-y-plato-latte-180ml-gris'),'https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-758815.jpg?v=1723743546&width=1080','https://beanbros.co/cdn/shop/files/epic-latte-cup-with-plate-180ml-273438.jpg?v=1723743546&width=1000'],
+ 'pitcher-350':[cc(6923,'studio-barista-jarra-de-leche-clasica-350ml-negra'),cc(5102,'studio-barista-jarra-de-leche-clasica-350ml-negra'),cc(5101,'studio-barista-jarra-de-leche-clasica-350ml-negra'),cc(5100,'studio-barista-jarra-de-leche-clasica-350ml-negra')],
+ 'motta-yellow':[cc(4850,'motta-jarra-de-leche-tulip-500ml-amarillo'),'https://cdn-prod.coffeedesk.io/media/18/3b/69/1730705588/dzbanek-motta-tulip-zolty-500-ml.jpg','https://www.wb.coffee/web/image/product.template/48591/image_1920?unique=0622b38','https://www.aromaespresso.ca/cdn/shop/products/MottaYellowPitcher.jpg'],
+ 'cafelat-cloths':[cc(4813,'cafelat-pack-4-panos-microfibra'),cc(4812,'cafelat-pack-4-panos-microfibra'),'https://clumsygoat.co.uk/cdn/shop/products/cafelat-microfibre-cloths-4-pack-cleaning-cloths-cafelat-486269.jpg?v=1627293149','https://www.creativecoffee.ca/images/products/cafelat-cloths-4.jpg'],
+ 'cafetto-gc2':['https://ineffablecoffee.com/cdn/shop/files/cafetto-gc2-450g.webp?crop=center&height=900&v=1750680228&width=900','https://kaffemester-i03.mycdn.no/mysimgprod/kaffemester_mystore_no/images/wJx1U_Cafetto_Cafetto_GC2_Grinder_Clean_1.webp/w800h800.webp','https://www.greenplantation.com/user/shop/big/6365_cafetto-gc2-grinder-cleaner-450-g.jpg','https://barista-espresso.se/cdn/shop/files/Cafetto-GC2-Grinder-Cleaner-450g.jpg'],
+ 'mhw-pitcher':[cc(5806,'mhw3bomber-jarra-de-leche-30-clasica-450ml-morado'),cc(5809,'mhw3bomber-jarra-de-leche-30-clasica-450ml-morado'),cc(5808,'mhw3bomber-jarra-de-leche-30-clasica-450ml-morado'),cc(5807,'mhw3bomber-jarra-de-leche-30-clasica-450ml-morado')],
+ 'epic-capp-turq':[cc(4777,'epic-taza-y-plato-cappuccino-230ml-turquesa'),cc(6858,'epic-taza-y-plato-cappuccino-230ml-turquesa'),'https://beanbros.co/cdn/shop/files/epic-cappuccino-cup-with-plate-230ml-129591.jpg?v=1723743547','https://beanbros.co/cdn/shop/files/epic-cappuccino-cup-with-plate-230ml-302116.jpg?v=1723743547'],
+ 'epic-capp-grey':[cc(4772,'epic-taza-y-plato-cappuccino-230ml-gris'),cc(6855,'epic-taza-y-plato-cappuccino-230ml-gris'),'https://beanbros.co/cdn/shop/files/epic-cappuccino-cup-with-plate-230ml-180495.jpg?v=1723743547','https://beanbros.co/cdn/shop/files/epic-cappuccino-cup-with-plate-230ml-939914.jpg?v=1723743548'],
+ 'epic-mug':['https://beanbros.co/cdn/shop/files/epic-mug-355ml-694888.jpg?v=1723743542&width=1080','https://beanbros.co/cdn/shop/files/epic-mug-355ml-370672.jpg?v=1723743543&width=1000','https://www.barista-pro.com/wp-content/uploads/epic-coffee-mug-black.jpg','https://www.barista-pro.com/wp-content/uploads/epic-mug-black-lifestyle.jpg'],
+ 'epic-double':[cc(4786,'epic-taza-y-plato-doble-cappuccino-280ml-azul'),cc(6822,'epic-taza-y-plato-doble-cappuccino-280ml-azul'),'https://beanbros.co/cdn/shop/files/epic-cappuccino-cup-with-plate-230ml-129591.jpg?v=1723743547','https://beanbros.co/cdn/shop/files/epic-cappuccino-cup-with-plate-230ml-302116.jpg?v=1723743547'],
+ 'origami-cupping':[cc(5926,'origami-taza-de-cata-coe'),cc(5928,'origami-taza-de-cata-coe'),cc(5927,'origami-taza-de-cata-coe'),'https://www.roguewavecoffee.ca/cdn/shop/products/OrigamiCuppingBowl_1024x1024.jpg'],
+ carter:['https://pisces.bbystatic.com/image2/BestBuy_US/images/products/4a714bc1-c4bb-47df-87a5-6ddaec80b13e.jpg','https://ihygge.hk/cdn/shop/files/Matte_Black_Move__Cold__and_Carry_-_yythkg.png?v=1723706270','https://www1.yohohongkong.com/images/upload/Proddb/1708335623110328313.jpg','https://fellowproducts.com/cdn/shop/files/022724_Website_Compare_Carter_Page_Desert_Capsule_Module__2x_08115247-3df8-4f67-9331-fc04376fda33.png?v=1709138061&width=1560'],
+ 'bialetti-pink':[cc(2095,'bialetti-exclusive-6-tazas-rosa-pastel'),'https://www.bialetti.com/media/catalog/product/cache/7/image/1200x/17f82f742ffe127f42dca9de82fb58b1/m/o/moka_exclusive_pink_6tazze.jpg','https://cdn.shopify.com/s/files/1/0513/5342/8667/files/bialetti-moka-exclusive-pink-6-cup.jpg','https://www.maxicoffee.com/images/products/bialetti-exclusive-rose-6-tasses.jpg'],
+ 'varia-kettle':['https://www.variabrewing.com/cdn/shop/files/AURA0.8LBLK.jpg?v=1716393149','https://www.variabrewing.com/cdn/shop/files/AURA0.8L-BLK-FLUX_cce2633b-3279-4198-8f91-31ec9a3274d9.png?v=1732337918','https://www.variabrewing.com/cdn/shop/files/AURA_BLACK_SIDE.jpg','https://www.variabrewing.com/cdn/shop/files/AURA_BLACK_LIFESTYLE.jpg'],
+ 'brewista-kettle':[cc(2108,'brewista-artisan-1l-kettle-whitewood-white-base'),cc(2109,'brewista-artisan-1l-kettle-whitewood-white-base'),'https://cdn.shopify.com/s/files/1/0445/6912/2719/products/BrewistaArtisanWhiteWood_1024x1024.jpg','https://www.creativecoffee.ca/images/products/brewista-artisan-white-wood-lifestyle.jpg'],
+ knockbox:[cc(4201,'studio-barista-picamarro-de-madera-y-acero'),cc(4202,'studio-barista-picamarro-de-madera-y-acero'),cc(4203,'studio-barista-picamarro-de-madera-y-acero'),'https://beanbros.co/cdn/shop/files/studio-barista-knock-box-wood-steel.jpg'],
+ 'dosing-cup':[cc(2356,'eureka-vaso-dosificador-80g'),cc(2357,'eureka-vaso-dosificador-80g'),'https://www.eureka.co.it/public/prodotti/immagini/dosing-cup-80g-1.jpg','https://www.eureka.co.it/public/prodotti/immagini/dosing-cup-80g-2.jpg']
+};
+
+export function galleryFor(id:string):ProductGallery|undefined{return gallery40[id]}
