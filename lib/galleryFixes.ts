@@ -15,9 +15,9 @@ export const galleryFixes:Record<string,ProductGallery>={
  ],
  'cafetto-gc2':[
   'https://ineffablecoffee.com/cdn/shop/files/cafetto-gc2-450g.webp?crop=center&height=900&v=1750680228&width=900',
-  'https://lazenskakava.s24.cdn-upgates.com/_cache/b/a/bace8a235df2ac2bef92996270c5b2b0-cafetto-grinder-clean-450g-cistic-mlynku.jpg',
-  'https://lazenskakava.s24.cdn-upgates.com/_cache/d/0/d080b2f9fc53423b684c4724dd467f38-cafetto-grinder-clean-450g-cistic-mlynku.webp',
-  'https://lazenskakava.s24.cdn-upgates.com/_cache/e/e/ee05b3626f3d92251b0f9cf916211771-cafetto-grinder-clean-450g-cistic-mlynku.webp'
+  'https://kaffemester-i03.mycdn.no/mysimgprod/kaffemester_mystore_no/images/wJx1U_Cafetto_Cafetto_GC2_Grinder_Clean_1.webp/w800h800.webp',
+  'https://cdn.cafetto.com/general-images/grinder-clean.jpg',
+  'https://www.jhornig.com/cdn/shop/articles/jhornig-muehlenreinigung-blogbeitrag-1_1200x800.jpg?v=1741614769'
  ]
 };
 
