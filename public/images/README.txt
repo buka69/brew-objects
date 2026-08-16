@@ -1,0 +1,1 @@
+Photographic product assets are generated for the demand-validation prototype and are not supplier photography.
