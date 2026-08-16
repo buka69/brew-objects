@@ -9,6 +9,14 @@ const allowed=[
  'comandantegrinder.com','www.comandantegrinder.com','eu.acaia.co'
 ];
 
+const overrides:[RegExp,string][]=[
+ [/moccamaster-kbg-select-copper/i,'https://assets.manufactum.de/p/202/202615/202615_01.jpg/moccamaster-kbg-select.jpg?canvas.aspectratio=1%3A1&canvas.height=100.0000%25&canvas.width=103.8000%25&h=800&q=90&scale.option=fill&w=0'],
+ [/cafetto-gc2/i,'https://barista-und-espresso.de/cdn/shop/files/cafetto-gc2-rengoringspellets-for-kaffekvarn-450g-899857.webp?v=1721499631'],
+ [/fellow-carter-bundle-move-3-in-1/i,'https://www.espressogear.com/cdn/shop/files/FEL951_3in1_carter_WEB_5000x.jpg?v=1733828013'],
+ [/varia-smart-kettle-black/i,'https://st.kofio.cz/img_product/igWQdvM9LJoUnB1/9783/sq_600_bLWNaJVMhSq1sIlcCYUH_84.jpg'],
+ [/epic-cups-coffee-mug-355ml-negro/i,'https://static.brw.pl/brw/img/produkt/812829/kubek-ceramiczny-do-picia-kawy-herbaty-napojow-czarny-350ml-slarge.jpg']
+];
+
 const decodeHtml=(s:string)=>s.replace(/&amp;/g,'&').replace(/&#x2F;/g,'/').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\\u002F/g,'/');
 
 function pickImage(html:string,base:URL){
@@ -43,6 +51,8 @@ export async function GET(req:NextRequest){
  try{u=new URL(raw)}catch{return new NextResponse('bad url',{status:400})}
  if(!['http:','https:'].includes(u.protocol)||!allowed.includes(u.hostname))return new NextResponse('host not allowed',{status:403});
  try{
+  const fixed=overrides.find(([pattern])=>pattern.test(u.pathname));
+  if(fixed)return await fetchImage(fixed[1],new URL(fixed[1]).origin+'/');
   const r=await fetch(u.toString(),{headers:{'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/128 Safari/537.36','accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8','accept-language':'en-US,en;q=0.9'},redirect:'follow',next:{revalidate:86400}});
   if(r.ok){
    const ct=(r.headers.get('content-type')||'').toLowerCase();
