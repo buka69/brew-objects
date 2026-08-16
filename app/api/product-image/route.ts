@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {galleryFor} from '../../../lib/gallery40';
+import {galleryFixFor} from '../../../lib/galleryFixes';
 import {catalog40} from '../../../lib/catalog40';
 
 export const runtime='nodejs';
@@ -45,7 +46,7 @@ export async function GET(req:NextRequest){
  const raw=req.nextUrl.searchParams.get('url')||'';
  const mappedId=explicitId||catalog40.find(p=>p.source===raw)?.id||'';
  const variant=Math.max(0,Math.min(3,Number(req.nextUrl.searchParams.get('variant')||0)||0));
- const gallery=mappedId?galleryFor(mappedId):undefined;
+ const gallery=mappedId?(galleryFixFor(mappedId)||galleryFor(mappedId)):undefined;
  if(gallery){
   try{return await fetchImage(gallery[variant])}
   catch{return new NextResponse(null,{status:404,headers:{'cache-control':'no-store'}})}
