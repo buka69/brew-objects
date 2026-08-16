@@ -1,6 +1,7 @@
 import './globals.css';
 import './controls.css';
 import './seo.css';
+import './cursors.css';
 import type {Metadata} from 'next';
 import Script from 'next/script';
 import {SITE_URL,siteKeywords} from '../lib/seo';
