@@ -7,7 +7,7 @@ type CartItem=CatalogProduct&{qty:number};
 type Sort='featured'|'price-asc'|'price-desc';
 const KEY='brew-objects-cart-v3',WKEY='brew-objects-wishlist-v1';
 const money=(n:number)=>new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR'}).format(n);
-const photo=(p:CatalogProduct)=>`/api/product-image?url=${encodeURIComponent(p.source)}`;
+const photo=(p:CatalogProduct)=>`/api/product-image?v=6&url=${encodeURIComponent(p.source)}`;
 const categoryOrder=['All','Brewing','Espresso','Grinders','Kettles','Scales','Latte Art','Drinkware','Cleaning','Lab'];
 const categoryCards=[['Pour Over','Brewing','v60'],['Espresso','Espresso','dosing-cup'],['Grinders','Grinders','grinder'],['Kettles','Kettles','kettle'],['Scales','Scales','scale'],['Latte Art','Latte Art','pitcher'],['Drinkware','Drinkware','epic-latte-grey'],['Cleaning','Cleaning','cafetto-gc2'],['Lab','Lab','origami-cupping'],['New','All','suiren']] as const;
 const byId=(id:string)=>catalog40.find(p=>p.id===id)!;
