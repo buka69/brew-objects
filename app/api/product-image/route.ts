@@ -10,11 +10,11 @@ const allowed=[
 ];
 
 const overrides:[RegExp,string][]=[
- [/moccamaster-kbg-select-copper/i,'https://www.moccamaster.es/pub/media/catalog/category/slider/KBG_Select/moccamaster-kbg-select-slider-1.1.jpg'],
+ [/moccamaster-kbg-select-copper/i,'https://nano-kaffee.de/cdn/shop/files/KBGSelectCopper.jpg?v=1732010415'],
  [/cafetto-gc2/i,'https://ineffablecoffee.com/cdn/shop/files/cafetto-gc2-450g.webp?crop=center&height=900&v=1750680228&width=900'],
- [/fellow-carter-bundle-move-3-in-1/i,'https://fellowproducts.com/cdn/shop/files/Web_PDP_CarterMoveMug-12oz_CoralCrush_1.png?v=1776292476&width=1200'],
+ [/fellow-carter-bundle-move-3-in-1/i,'https://pisces.bbystatic.com/image2/BestBuy_US/images/products/4a714bc1-c4bb-47df-87a5-6ddaec80b13e.jpg'],
  [/varia-smart-kettle-black/i,'https://www.variabrewing.com/cdn/shop/files/AURA0.8LBLK.jpg?v=1716393149'],
- [/epic-cups-coffee-mug-355ml-negro/i,'https://kinto-europe.com/cdn/shop/products/20757.jpg?v=1561465499&width=1024']
+ [/epic-cups-coffee-mug-355ml-negro/i,'https://beanbros.co/cdn/shop/files/epic-mug-355ml-694888.jpg?v=1723743542']
 ];
 
 const decodeHtml=(s:string)=>s.replace(/&amp;/g,'&').replace(/&#x2F;/g,'/').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\\u002F/g,'/');
