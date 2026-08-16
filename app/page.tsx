@@ -1,3 +1,5 @@
 import Store40 from '../components/Store40';
 import EscapeClose from '../components/EscapeClose';
-export default function Page(){return <><EscapeClose/><Store40/></>}
+import SeoHomeContent from '../components/SeoHomeContent';
+
+export default function Page(){return <><EscapeClose/><Store40/><SeoHomeContent/></>}
