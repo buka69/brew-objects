@@ -43,7 +43,8 @@ async function inspect(url:string,referer:string){
   const b=Buffer.from(await r.arrayBuffer());const meta=await sharp(b).metadata();const {data}=await sharp(b).resize(16,16,{fit:'fill'}).grayscale().raw().toBuffer({resolveWithObject:true});let sum=0;for(const v of data)sum+=v;const avg=sum/data.length;const bits=[...data].map(v=>v>=avg?1:0);return {url,width:meta.width||0,height:meta.height||0,bytes:b.length,ahash:toHex(bits)};
  }catch(e){return {url,error:e instanceof Error?e.message:String(e)}}
 }
-function hamming(a:string,b:string){let n=0;const x=BigInt('0x'+a)^BigInt('0x'+b);let y=x;while(y){n+=Number(y&1n);y>>=1n}return n}
+const pop=[0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4];
+function hamming(a:string,b:string){let n=0;const len=Math.min(a.length,b.length);for(let i=0;i<len;i++)n+=pop[parseInt(a[i],16)^parseInt(b[i],16)];return n+Math.abs(a.length-b.length)*4}
 export async function GET(req:NextRequest){
  const raw=req.nextUrl.searchParams.get('url');if(!raw)return NextResponse.json({error:'missing url'},{status:400});let u:URL;try{u=new URL(raw)}catch{return NextResponse.json({error:'bad url'},{status:400})}if(!allowed.includes(u.hostname))return NextResponse.json({error:'host not allowed'},{status:403});
  const candidates=(await getCandidates(u)).slice(0,20);const inspected=await Promise.all(candidates.map(x=>inspect(x,u.origin+'/')));const good=inspected.filter((x):x is {url:string;width:number;height:number;bytes:number;ahash:string}=>'ahash' in x);
