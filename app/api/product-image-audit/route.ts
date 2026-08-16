@@ -22,6 +22,7 @@ function collectImages(html:string,base:URL){
  for(const m of html.matchAll(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["']/gi))add(m[1]);
  for(const block of html.matchAll(/"image"\s*:\s*\[([^\]]+)\]/gi))for(const m of block[1].matchAll(/"([^"]+)"/g))add(m[1]);
  for(const m of html.matchAll(/"image"\s*:\s*"([^"]+)"/gi))add(m[1]);
+ for(const tag of html.matchAll(/<a\b[^>]*>/gi))for(const m of tag[0].matchAll(/(?:href|data-image|data-zoom-image)=["']([^"']+\.(?:jpg|jpeg|png|webp)(?:\?[^"']*)?)["']/gi))add(m[1]);
  for(const tag of html.matchAll(/<img\b[^>]*>/gi)){
   const t=tag[0];
   for(const m of t.matchAll(/(?:data-zoom-image|data-image-large-src|data-src|src)=["']([^"']+)["']/gi))add(m[1]);
@@ -46,11 +47,25 @@ async function inspect(url:string,referer:string){
 }
 const pop=[0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4];
 function hamming(a:string,b:string){let n=0;const len=Math.min(a.length,b.length);for(let i=0;i<len;i++)n+=pop[parseInt(a[i],16)^parseInt(b[i],16)];return n+Math.abs(a.length-b.length)*4}
+async function audit(id:string,raw:string){
+ let u:URL;try{u=new URL(raw)}catch{return {id,source:raw,error:'bad url'}}
+ if(!allowed.includes(u.hostname))return {id,source:raw,error:'host not allowed'};
+ const candidates=(await getCandidates(u)).slice(0,24);
+ const inspected=await Promise.all(candidates.map(x=>inspect(x,u.origin+'/')));
+ const good=inspected.filter((x):x is {url:string;width:number;height:number;bytes:number;ahash:string}=>'ahash' in x);
+ const selected:typeof good=[];
+ for(const x of good){if(x.width<250||x.height<250)continue;if(selected.every(y=>hamming(x.ahash,y.ahash)>=18))selected.push(x);if(selected.length===4)break}
+ return {id,source:raw,count:candidates.length,selected,all:inspected};
+}
 export async function GET(req:NextRequest){
- const id=req.nextUrl.searchParams.get('id');
+ const ids=(req.nextUrl.searchParams.get('ids')||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,4);
+ if(ids.length){
+  const products=ids.map(id=>catalog40.find(p=>p.id===id)).filter(Boolean) as typeof catalog40;
+  const results=await Promise.all(products.map(p=>audit(p.id,p.source)));
+  return NextResponse.json({results});
+ }
+ const id=req.nextUrl.searchParams.get('id')||'';
  const raw=req.nextUrl.searchParams.get('url')||catalog40.find(p=>p.id===id)?.source;
- if(!raw)return NextResponse.json({error:'missing product id/url'},{status:400});let u:URL;try{u=new URL(raw)}catch{return NextResponse.json({error:'bad url'},{status:400})}if(!allowed.includes(u.hostname))return NextResponse.json({error:'host not allowed'},{status:403});
- const candidates=(await getCandidates(u)).slice(0,20);const inspected=await Promise.all(candidates.map(x=>inspect(x,u.origin+'/')));const good=inspected.filter((x):x is {url:string;width:number;height:number;bytes:number;ahash:string}=>'ahash' in x);
- const selected:typeof good=[];for(const x of good){if(x.width<250||x.height<250)continue;if(selected.every(y=>hamming(x.ahash,y.ahash)>=18))selected.push(x);if(selected.length===4)break}
- return NextResponse.json({id,source:raw,count:candidates.length,selected,all:inspected});
+ if(!raw)return NextResponse.json({error:'missing product id/url'},{status:400});
+ return NextResponse.json(await audit(id,raw));
 }
