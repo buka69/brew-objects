@@ -10,11 +10,11 @@ const allowed=[
 ];
 
 const overrides:[RegExp,string][]=[
- [/moccamaster-kbg-select-copper/i,'https://assets.manufactum.de/p/202/202615/202615_01.jpg/moccamaster-kbg-select.jpg?canvas.aspectratio=1%3A1&canvas.height=100.0000%25&canvas.width=103.8000%25&h=800&q=90&scale.option=fill&w=0'],
- [/cafetto-gc2/i,'https://barista-und-espresso.de/cdn/shop/files/cafetto-gc2-rengoringspellets-for-kaffekvarn-450g-899857.webp?v=1721499631'],
- [/fellow-carter-bundle-move-3-in-1/i,'https://www.espressogear.com/cdn/shop/files/FEL951_3in1_carter_WEB_5000x.jpg?v=1733828013'],
- [/varia-smart-kettle-black/i,'https://st.kofio.cz/img_product/igWQdvM9LJoUnB1/9783/sq_600_bLWNaJVMhSq1sIlcCYUH_84.jpg'],
- [/epic-cups-coffee-mug-355ml-negro/i,'https://static.brw.pl/brw/img/produkt/812829/kubek-ceramiczny-do-picia-kawy-herbaty-napojow-czarny-350ml-slarge.jpg']
+ [/moccamaster-kbg-select-copper/i,'https://www.moccamaster.es/pub/media/catalog/category/slider/KBG_Select/moccamaster-kbg-select-slider-1.1.jpg'],
+ [/cafetto-gc2/i,'https://ineffablecoffee.com/cdn/shop/files/cafetto-gc2-450g.webp?crop=center&height=900&v=1750680228&width=900'],
+ [/fellow-carter-bundle-move-3-in-1/i,'https://fellowproducts.com/cdn/shop/files/Web_PDP_CarterMoveMug-12oz_CoralCrush_1.png?v=1776292476&width=1200'],
+ [/varia-smart-kettle-black/i,'https://www.variabrewing.com/cdn/shop/files/AURA0.8LBLK.jpg?v=1716393149'],
+ [/epic-cups-coffee-mug-355ml-negro/i,'https://kinto-europe.com/cdn/shop/products/20757.jpg?v=1561465499&width=1024']
 ];
 
 const decodeHtml=(s:string)=>s.replace(/&amp;/g,'&').replace(/&#x2F;/g,'/').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\\u002F/g,'/');
@@ -71,7 +71,7 @@ export async function GET(req:NextRequest){
   }
   throw new Error('image not found');
  }catch{
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><rect width="100%" height="100%" fill="#f1ede5"/><text x="50%" y="49%" text-anchor="middle" font-family="Arial" font-size="30" fill="#777">Photo loading</text><text x="50%" y="55%" text-anchor="middle" font-family="Arial" font-size="18" fill="#999">BREW / OBJECTS</text></svg>';
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><rect width="100%" height="100%" fill="#f1ede5"/><text x="50%" y="49%" text-anchor="middle" font-family="Arial" font-size="30" fill="#777">Photo unavailable</text><text x="50%" y="55%" text-anchor="middle" font-family="Arial" font-size="18" fill="#999">BREW / OBJECTS</text></svg>';
   return new NextResponse(svg,{status:200,headers:{'content-type':'image/svg+xml','cache-control':'no-store'}});
  }
 }
