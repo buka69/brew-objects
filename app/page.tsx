@@ -1,7 +1,9 @@
 import Store40 from '../components/Store40';
 import EscapeClose from '../components/EscapeClose';
 import SeoHomeContent from '../components/SeoHomeContent';
+import SeoFooterLinks from '../components/SeoFooterLinks';
 import ProductModalUrlSync from '../components/ProductModalUrlSync';
 import FilterClearFix from '../components/FilterClearFix';
+import CategoryCircleNavigation from '../components/CategoryCircleNavigation';
 
-export default function Page(){return <><EscapeClose/><ProductModalUrlSync/><FilterClearFix/><Store40/><SeoHomeContent/></>}
+export default function Page(){return <><EscapeClose/><ProductModalUrlSync/><FilterClearFix/><CategoryCircleNavigation/><Store40/><SeoHomeContent/><SeoFooterLinks/></>}
