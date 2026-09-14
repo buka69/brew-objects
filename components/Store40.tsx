@@ -1,17 +1,15 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
-import {catalog40,CatalogProduct} from '../lib/catalog40';
+import type {CatalogProduct} from '../lib/catalog';
 import {track} from '../lib/analytics';
 
 type CartItem=CatalogProduct&{qty:number};
 type Sort='featured'|'price-asc'|'price-desc';
 const KEY='brew-objects-cart-v3',WKEY='brew-objects-wishlist-v1';
 const money=(n:number)=>new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR'}).format(n);
-const photo=(p:CatalogProduct,variant=0)=>`/api/product-image?v=8&id=${encodeURIComponent(p.id)}&variant=${variant}&url=${encodeURIComponent(p.source)}`;
-const categoryOrder=['All','Brewing','Espresso','Grinders','Kettles','Scales','Latte Art','Drinkware','Cleaning','Lab'];
+const photo=(p:CatalogProduct,variant=0)=>`/api/product-image?id=${encodeURIComponent(p.id)}&variant=${variant}`;
+const preferredCategoryOrder=['All','Brewing','Espresso','Grinders','Kettles','Scales','Latte Art','Drinkware','Cleaning','Lab'];
 const categoryCards=[['Pour Over','Brewing','v60'],['Espresso','Espresso','dosing-cup'],['Grinders','Grinders','grinder'],['Kettles','Kettles','kettle'],['Scales','Scales','scale'],['Latte Art','Latte Art','pitcher'],['Drinkware','Drinkware','epic-latte-grey'],['Cleaning','Cleaning','cafetto-gc2'],['Lab','Lab','origami-cupping'],['New','All','suiren']] as const;
-const byId=(id:string)=>catalog40.find(p=>p.id===id)!;
-const MAX_PRICE=Math.ceil(Math.max(...catalog40.map(p=>p.price))/50)*50;
 const promoSlides=[
  {id:'espresso',alt:'Espresso machine promotional banner'},
  {id:'studio',alt:'Studio Barista coffee corner promotional banner'},
@@ -19,8 +17,11 @@ const promoSlides=[
  {id:'toddy',alt:'Toddy domestic cold brew system promotional banner'}
 ] as const;
 
-export default function Store40(){
- const[category,setCategory]=useState('All');const[query,setQuery]=useState('');const[priceMax,setPriceMax]=useState(MAX_PRICE);const[sort,setSort]=useState<Sort>('featured');
+export default function Store40({products}:{products:CatalogProduct[]}){
+ const categoryOrder=useMemo(()=>['All',...preferredCategoryOrder.slice(1).filter(c=>products.some(p=>p.category===c)),...[...new Set(products.map(p=>p.category))].filter(c=>!preferredCategoryOrder.includes(c))],[products]);
+ const maxPrice=useMemo(()=>Math.max(50,Math.ceil(Math.max(...products.map(p=>p.price),0)/50)*50),[products]);
+ const byId=(id:string)=>products.find(p=>p.id===id)||products[0];
+ const[category,setCategory]=useState('All');const[query,setQuery]=useState('');const[priceMax,setPriceMax]=useState(maxPrice);const[sort,setSort]=useState<Sort>('featured');
  const[cart,setCart]=useState<CartItem[]>([]);const[wishlist,setWishlist]=useState<string[]>([]);const[wishlistOnly,setWishlistOnly]=useState(false);
  const[selected,setSelected]=useState<CatalogProduct|null>(null);const[cartOpen,setCartOpen]=useState(false);const[checkout,setCheckout]=useState(false);const[wholesale,setWholesale]=useState(false);const[promoIndex,setPromoIndex]=useState(0);
  const[galleryCount,setGalleryCount]=useState(4);const[activeImage,setActiveImage]=useState(0);
@@ -28,40 +29,31 @@ export default function Store40(){
  useEffect(()=>{try{localStorage.setItem(KEY,JSON.stringify(cart))}catch{}},[cart]);
  useEffect(()=>{try{localStorage.setItem(WKEY,JSON.stringify(wishlist))}catch{}},[wishlist]);
  useEffect(()=>{const t=window.setInterval(()=>setPromoIndex(i=>(i+1)%promoSlides.length),5500);return()=>window.clearInterval(t)},[]);
- useEffect(()=>{
-  setActiveImage(0);
-  if(!selected){setGalleryCount(4);return}
-  const controller=new AbortController();
-  fetch(`/api/product-gallery?id=${encodeURIComponent(selected.id)}`,{signal:controller.signal})
-   .then(r=>r.ok?r.json():Promise.reject())
-   .then(d=>setGalleryCount(Math.max(1,Number(d.count)||1)))
-   .catch(()=>setGalleryCount(4));
-  return()=>controller.abort();
- },[selected]);
+ useEffect(()=>{setActiveImage(0);setGalleryCount(Math.max(1,selected?.images.length||1))},[selected]);
  const filtered=useMemo(()=>{
   const q=query.trim().toLowerCase();
-  const base=catalog40.filter(p=>(category==='All'||p.category===category)&&p.price<=priceMax&&(!wishlistOnly||wishlist.includes(p.id))&&(`${p.name} ${p.description}`.toLowerCase().includes(q)));
+  const base=products.filter(p=>(category==='All'||p.category===category)&&p.price<=priceMax&&(!wishlistOnly||wishlist.includes(p.id))&&(`${p.name} ${p.description}`.toLowerCase().includes(q)));
   if(sort==='price-asc')return [...base].sort((a,b)=>a.price-b.price);
   if(sort==='price-desc')return [...base].sort((a,b)=>b.price-a.price);
   return base;
- },[category,query,priceMax,sort,wishlistOnly,wishlist]);
+ },[products,category,query,priceMax,sort,wishlistOnly,wishlist]);
  const count=cart.reduce((s,x)=>s+x.qty,0),subtotal=cart.reduce((s,x)=>s+x.price*x.qty,0);
  const add=(p:CatalogProduct)=>{setCart(c=>{const x=c.find(i=>i.id===p.id);return x?c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...c,{...p,qty:1}]});setCartOpen(true);track('add_to_cart',{product_id:p.id,price:p.price,currency:'EUR'})};
  const qty=(id:string,d:number)=>setCart(c=>c.flatMap(i=>i.id!==id?[i]:i.qty+d<=0?[]:[{...i,qty:i.qty+d}]));
  const toggleFav=(id:string)=>setWishlist(w=>w.includes(id)?w.filter(x=>x!==id):[...w,id]);
  const choose=(c:string)=>{setCategory(c);setWishlistOnly(false);setTimeout(()=>document.getElementById('shop')?.scrollIntoView({behavior:'smooth'}),0)};
- const clear=()=>{setCategory('All');setQuery('');setPriceMax(MAX_PRICE);setSort('featured');setWishlistOnly(false)};
+ const clear=()=>{setCategory('All');setQuery('');setPriceMax(maxPrice);setSort('featured');setWishlistOnly(false)};
  const movePromo=(d:number)=>setPromoIndex(i=>(i+d+promoSlides.length)%promoSlides.length);
- const related=selected?catalog40.filter(p=>p.id!==selected.id&&(p.category===selected.category||p.category==='Brewing')).slice(0,4):[];
+ const related=selected?products.filter(p=>p.id!==selected.id&&(p.category===selected.category||p.category==='Brewing')).slice(0,4):[];
  return <>
   <div className="topbar"><span>◎ Ship to: Europe⌄</span><span>Pre-launch: special prices for early supporters</span><button onClick={()=>setWholesale(true)}>B2B / Wholesale</button></div>
   <header><a className="brand" href="#">BREW / OBJECTS<small>Specialty coffee tools</small></a><nav className="mainnav"><button onClick={()=>choose('Brewing')}>Brewing</button><button onClick={()=>choose('Espresso')}>Espresso</button><button onClick={()=>choose('Latte Art')}>Latte Art</button><button onClick={()=>choose('Drinkware')}>Drinkware</button><button onClick={()=>choose('Cleaning')}>Cleaning</button></nav><div className="headtools"><label className="search"><input aria-label="Search products" placeholder="Search tools..." value={query} onChange={e=>setQuery(e.target.value)}/><span>⌕</span></label><button className={`wishlistTop ${wishlistOnly?'active':''}`} aria-label="Show wishlist" onClick={()=>setWishlistOnly(v=>!v)}>♡{wishlist.length>0&&<b>{wishlist.length}</b>}</button><button className="cart" onClick={()=>setCartOpen(true)}>Cart <b>{count}</b></button></div></header>
   <main>
    <section className="promoCarousel" aria-label="Promotions"><div className="promoViewport"><div className="promoTrack" style={{transform:`translateX(-${promoIndex*100}%)`}}>{promoSlides.map((s,i)=><article className="promoSlide" key={s.id} aria-hidden={promoIndex!==i}><img className="promoBannerImage" src={`/api/promo-image?key=${s.id}&v=2`} alt={s.alt}/></article>)}</div><button className="promoArrow prev" aria-label="Previous promotion" onClick={()=>movePromo(-1)}>‹</button><button className="promoArrow next" aria-label="Next promotion" onClick={()=>movePromo(1)}>›</button><div className="promoDots">{promoSlides.map((s,i)=><button key={s.id} className={i===promoIndex?'active':''} aria-label={`Show promotion ${i+1}`} onClick={()=>setPromoIndex(i)}/>)}</div></div></section>
-   <section className="categories"><div className="sectionTitle"><h3>Top Categories</h3><a href="#shop">View all categories →</a></div><div className="catrow ten">{categoryCards.map(([label,c,id])=>{const p=byId(id);return <button key={label} onClick={()=>choose(c)}><span className="catimg"><img src={photo(p)} alt={label}/></span><small>{label}</small></button>})}</div></section>
-   <section id="shop" className="shop"><aside className="filters"><div className="filterHead"><b>Filter</b><button onClick={clear}>Clear all</button></div><div className="filterBlock"><b>Category</b>{categoryOrder.filter(c=>c!=='All').map(c=><label key={c}><input type="checkbox" checked={category===c} onChange={()=>setCategory(category===c?'All':c)}/>{c} ({catalog40.filter(p=>p.category===c).length})</label>)}</div><div className="filterBlock priceFilter"><b>Price up to <strong>{money(priceMax)}</strong></b><input className="priceRange" type="range" min="0" max={MAX_PRICE} step="5" value={priceMax} onChange={e=>setPriceMax(Number(e.target.value))}/><small><span>€0</span><span>{money(MAX_PRICE)}</span></small></div><div className="filterBlock"><b>Saved</b><label className="wishlistCheck"><input type="checkbox" checked={wishlistOnly} onChange={e=>setWishlistOnly(e.target.checked)}/>Wishlist only ({wishlist.length})</label></div></aside>
+   <section className="categories"><div className="sectionTitle"><h3>Top Categories</h3><a href="#shop">View all categories →</a></div><div className="catrow ten">{categoryCards.map(([label,c,id])=>{const p=byId(id);return p?<button key={label} onClick={()=>choose(c)}><span className="catimg"><img src={photo(p)} alt={label}/></span><small>{label}</small></button>:null})}</div></section>
+   <section id="shop" className="shop"><aside className="filters"><div className="filterHead"><b>Filter</b><button onClick={clear}>Clear all</button></div><div className="filterBlock"><b>Category</b>{categoryOrder.filter(c=>c!=='All').map(c=><label key={c}><input type="checkbox" checked={category===c} onChange={()=>setCategory(category===c?'All':c)}/>{c} ({products.filter(p=>p.category===c).length})</label>)}</div><div className="filterBlock priceFilter"><b>Price up to <strong>{money(priceMax)}</strong></b><input className="priceRange" type="range" min="0" max={maxPrice} step="5" value={priceMax} onChange={e=>setPriceMax(Number(e.target.value))}/><small><span>€0</span><span>{money(maxPrice)}</span></small></div><div className="filterBlock"><b>Saved</b><label className="wishlistCheck"><input type="checkbox" checked={wishlistOnly} onChange={e=>setWishlistOnly(e.target.checked)}/>Wishlist only ({wishlist.length})</label></div></aside>
     <div className="catalog"><div className="catalogHead"><div><h2>{filtered.length} products</h2>{wishlistOnly&&<small className="resultHint">Showing saved products</small>}</div><label className="sortWrap"><span>Sort</span><select aria-label="Sort products" value={sort} onChange={e=>setSort(e.target.value as Sort)}><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label></div>
-    <div className="chips" role="group" aria-label="Product categories">{categoryOrder.map(c=><button key={c} className={category===c?'active':''} onClick={()=>{setCategory(c);setWishlistOnly(false)}}>{c}<span>{c==='All'?catalog40.length:catalog40.filter(p=>p.category===c).length}</span></button>)}</div>
+    <div className="chips" role="group" aria-label="Product categories">{categoryOrder.map(c=><button key={c} className={category===c?'active':''} onClick={()=>{setCategory(c);setWishlistOnly(false)}}>{c}<span>{c==='All'?products.length:products.filter(p=>p.category===c).length}</span></button>)}</div>
     <div className="grid six">{filtered.map(p=><article key={p.id} className={wishlist.includes(p.id)?'isFavorite':''}><button className="favButton" aria-label={wishlist.includes(p.id)?`Remove ${p.name} from wishlist`:`Add ${p.name} to wishlist`} aria-pressed={wishlist.includes(p.id)} onClick={()=>toggleFav(p.id)}>{wishlist.includes(p.id)?'♥':'♡'}</button><button className="productMain" onClick={()=>{setSelected(p);track('view_item',{product_id:p.id})}}><div className="pic realPic"><img src={photo(p)} alt={p.name} loading="lazy"/>{p.badge&&<span className="badge">{p.badge}</span>}</div><div className="meta"><small>{p.category}</small><h3>{p.name}</h3><p>{p.description}</p><div className="rating"><span>★★★★★</span><small>({p.reviews})</small></div></div></button><div className="buy"><strong>{money(p.price)}</strong><button className="plus" aria-label={`Add ${p.name} to cart`} onClick={()=>add(p)}>+</button></div></article>)}</div>{filtered.length===0&&<div className="emptyState"><b>No products match these filters.</b><button onClick={clear}>Clear filters</button></div>}</div></section>
    <section className="serviceStrip"><span>◇ <b>Pre-launch prices</b><small>Reference pricing for validation</small></span><span>♢ <b>European launch</b><small>Testing demand across the EU</small></span><span>▣ <b>Secure checkout</b><small>No payment collected in prototype</small></span><span>◉ <b>Need help?</b><small>hello@brewobjects.com</small></span></section>
   </main>
