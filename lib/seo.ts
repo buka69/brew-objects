@@ -1,4 +1,4 @@
-import type {CatalogProduct} from './catalog40';
+import type {CatalogProduct} from './catalog';
 
 export const SITE_URL='https://brew-objects.vercel.app';
 
@@ -18,7 +18,7 @@ const brandRules:[RegExp,string][]=[
  [/^AeroPress/i,'AeroPress'],[/^Origami/i,'Origami'],[/^Epic/i,'Epic'],[/^Studio Barista/i,'Studio Barista'],[/^Motta/i,'Motta'],
  [/^Cafelat/i,'Cafelat'],[/^Cafetto/i,'Cafetto'],[/^MHW3Bomber/i,'MHW3Bomber'],[/^Varia/i,'Varia'],[/^Brewista/i,'Brewista'],[/^Eureka/i,'Eureka']
 ];
-export function brandFor(p:CatalogProduct){return brandRules.find(([re])=>re.test(p.name))?.[1]||p.name.split(' ')[0]}
+export function brandFor(p:CatalogProduct){return p.brand||brandRules.find(([re])=>re.test(p.name))?.[1]||p.name.split(' ')[0]}
 export const brandSlug=(brand:string)=>slugify(brand);
 
 export const categoryCopy:Record<string,{title:string;description:string;intro:string;keywords:string[]}>= {
