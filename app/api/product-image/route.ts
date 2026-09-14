@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {catalog40} from '../../../lib/catalog40';
+import {getProducts} from '../../../lib/catalog';
 import {sourceGallery} from '../../../lib/sourceGallery';
 
 export const runtime='nodejs';
@@ -35,7 +35,7 @@ function pickImage(html:string,base:URL){
 export async function GET(req:NextRequest){
  const explicitId=req.nextUrl.searchParams.get('id')||'';
  const raw=req.nextUrl.searchParams.get('url')||'';
- const mappedId=explicitId||catalog40.find(p=>p.source===raw)?.id||'';
+ const mappedId=explicitId||(await getProducts()).find(p=>p.source===raw)?.id||'';
  const variant=Math.max(0,Math.min(30,Number(req.nextUrl.searchParams.get('variant')||0)||0));
 
  if(mappedId){

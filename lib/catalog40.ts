@@ -1,4 +1,4 @@
-export type CatalogProduct={id:string;name:string;category:string;price:number;source:string;description:string;rating:string;reviews:number;badge?:string;details:string[]};
+export type CatalogProduct={id:string;slug?:string;name:string;category:string;brand?:string;price:number;currency?:string;source:string;description:string;rating:string;reviews:number;badge?:string;details:string[];images?:{url:string;position:number;alt?:string|null}[];status?:string;stock?:number|null;isFeatured?:boolean;b2b?:boolean};
 const d=(description:string,category:string)=>[description,'Real market reference product',`Category: ${category}`,'Pre-launch demand test'];
 export const catalog40:CatalogProduct[]=[
 {id:'v60',name:'Ceramic Pour Over Dripper',category:'Brewing',price:39.9,source:'https://www.hario-europe.com/products/v60-ceramic-colour-drippers-02',description:'Size 02 · 1–4 cups',rating:'4.9',reviews:124,badge:'BESTSELLER',details:d('Size 02 · 1–4 cups','Brewing')},
