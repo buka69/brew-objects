@@ -6,5 +6,8 @@ import ProductModalUrlSync from '../components/ProductModalUrlSync';
 import FilterClearFix from '../components/FilterClearFix';
 import CategoryCircleNavigation from '../components/CategoryCircleNavigation';
 import HomeHashActions from '../components/HomeHashActions';
+import {getCatalog} from '../lib/catalog-repository';
 
-export default function Page(){return <><EscapeClose/><ProductModalUrlSync/><FilterClearFix/><CategoryCircleNavigation/><HomeHashActions/><Store40/><SeoHomeContent/><SeoFooterLinks/></>}
+export const dynamic='force-dynamic';
+
+export default async function Page(){const products=await getCatalog();return <><EscapeClose/><ProductModalUrlSync/><FilterClearFix/><CategoryCircleNavigation/><HomeHashActions/><Store40 products={products}/><SeoHomeContent/><SeoFooterLinks products={products}/></>}
