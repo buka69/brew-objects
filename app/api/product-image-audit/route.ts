@@ -12,8 +12,10 @@ async function inspect(url:string){
  try{const origin=new URL(url).origin+'/';const r=await fetch(url,{headers:{'user-agent':'Mozilla/5.0','referer':origin,'accept':'image/avif,image/webp,image/apng,image/*,*/*;q=0.8'},redirect:'follow',cache:'no-store'});if(!r.ok)throw new Error(String(r.status));const ct=(r.headers.get('content-type')||'').toLowerCase();if(!ct.startsWith('image/'))throw new Error('not image');const b=Buffer.from(await r.arrayBuffer());const meta=await sharp(b).metadata();const {data}=await sharp(b).resize(16,16,{fit:'fill'}).grayscale().raw().toBuffer({resolveWithObject:true});let sum=0;for(const v of data)sum+=v;const avg=sum/data.length;const bits=[...data].map(v=>v>=avg?1:0);return {url,width:meta.width||0,height:meta.height||0,bytes:b.length,ahash:toHex(bits)}}catch(e){return {url,error:e instanceof Error?e.message:String(e)}}
 }
 async function audit(id:string){
- const product=await getProductById(id);const gallery=product?.images.map(image=>image.url);
- if(!gallery)return {id,ok:false,error:'no gallery'};
+ const product=await getProductById(id);
+ if(!product)return {id,ok:false,error:'no product'};
+ const gallery=product.images.map(image=>image.url);
+ if(!gallery.length)return {id,ok:false,error:'no gallery'};
  const images=await Promise.all(gallery.map(inspect));const good=images.filter((x):x is {url:string;width:number;height:number;bytes:number;ahash:string}=>'ahash' in x);const pairs:{a:number;b:number;distance:number}[]=[];
  for(let a=0;a<good.length;a++)for(let b=a+1;b<good.length;b++)pairs.push({a,b,distance:hamming(good[a].ahash,good[b].ahash)});
  const minDistance=pairs.length?Math.min(...pairs.map(x=>x.distance)):0;const uniqueUrls=new Set(gallery.map(x=>x.split('?')[0].toLowerCase())).size===gallery.length;const ok=good.length===gallery.length&&uniqueUrls&&minDistance>=10;
