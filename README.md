@@ -1,14 +1,12 @@
 # BREW / OBJECTS
 
-Deployment-ready Next.js MVP for validating demand for specialty coffee equipment across Europe (B2C + B2B).
+Next.js storefront for specialty coffee equipment.
 
-## Local
-`npm install`
-`npm run dev`
+## Supabase catalogue
 
-## Vercel
-Import this repository into Vercel. Framework: Next.js. No environment variables are required for the first deploy.
+1. Create a Supabase project.
+2. Run `supabase/schema.sql` in its SQL editor.
+3. Run `supabase/seed.sql` to import all current products and galleries.
+4. Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to Vercel and redeploy.
 
-Optional analytics variables:
-- `NEXT_PUBLIC_GA4_ID`
-- `NEXT_PUBLIC_META_PIXEL_ID`
+Products, brands, categories and images can then be edited in Supabase. Published changes appear within about 60 seconds. Until Supabase is configured, the storefront safely uses its bundled catalogue.

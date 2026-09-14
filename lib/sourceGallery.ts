@@ -1,6 +1,6 @@
 import {galleryFor} from './gallery40';
 import {galleryFixFor} from './galleryFixes';
-import {catalog40} from './catalog40';
+import {getProductById} from './catalog';
 
 const isComplementos=(host:string)=>host==='www.complementosdelcafe.com'||host==='complementosdelcafe.com'||host==='b2c.complementosdelcafe.com';
 const decode=(s:string)=>s.replace(/&amp;/g,'&').replace(/\\u002F/g,'/').replace(/\\u0026/g,'&');
@@ -22,7 +22,8 @@ function complementosGallery(html:string,page:URL){
 }
 
 export async function sourceGallery(id:string){
- const p=catalog40.find(x=>x.id===id);
+ const p=await getProductById(id);
+ if(p?.images?.length)return [...p.images].sort((a,b)=>a.position-b.position).map(x=>x.url);
  if(!p)return [];
 
  // The old Hario Europe hero URL now resolves to a generic lifestyle image.
